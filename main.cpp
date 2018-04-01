@@ -1,7 +1,10 @@
+
 #include <iostream>
 #include <cstring>
 #include <time.h>
 #include<cstdlib>
+#include<conio.h>
+#include<windows.h>
 
 using namespace std;
 int random_index();
@@ -16,7 +19,7 @@ class GameFunction{
         int copyBoard[4][4];
         char control;
         int score=0;
-    
+
         void displayGameWithArandomNumber(int,int);
         void inputControlButton();
         int checkWinOrLose();
@@ -32,10 +35,11 @@ class GameFunction{
 
 //main function
 int main( ){
+
     srand(time(0));
     GameFunction exe;
     exe.gamePlay();
-  
+    system("pause");
     return 0;
 }
 
@@ -47,14 +51,12 @@ int random_index()
     do{
         index=rand()%10;
     }while(index>3);
-    
+
     return index; //get random number about: 0 to 3
 }
 
 void GameFunction::inputControlButton(){
-        system("stty raw");
-        cin>>control;
-        system("stty cooked");
+    control=getch();
     if(control=='r' || control=='R'){
         score=0;
         setZero();
@@ -78,7 +80,7 @@ void GameFunction::setZero(){
 
 int GameFunction::checkWinOrLose(){
     int countNumberIsNotZero=0;
-    
+
     for(int i=0;i<=3;i++)
         for(int j=0;j<=3;j++){
             if(board[i][j]==2048)   return win;
@@ -117,7 +119,7 @@ void GameFunction::displayGameWithArandomNumber(int i,int j){
 }
 
 void GameFunction::fillSpace(){
-    
+
         switch(control)
         {
             case 'w':
@@ -132,7 +134,7 @@ void GameFunction::fillSpace(){
                                 }
                         }
                     }break;
-                
+
             case 's':
                 for(int i=0;i<4;i++)
                     for(int j=3;j>=0;j--){
@@ -144,7 +146,7 @@ void GameFunction::fillSpace(){
                                     break;
                                 }
                         }
-                        
+
                     }
                 break;
             case 'a':
@@ -158,10 +160,10 @@ void GameFunction::fillSpace(){
                                     break;
                                 }
                         }
-                        
+
                     }break;
-                
-                
+
+
             case 'd':
                 for(int i=0;i<4;i++)
                     for(int j=3;j>=0;j--){
@@ -173,7 +175,7 @@ void GameFunction::fillSpace(){
                                     break;
                                 }
                         }
-                        
+
                     }break;
         }
 }
@@ -191,7 +193,7 @@ void GameFunction::plusValue(){
                         fillSpace();
                     }
                 }break;
-            
+
         case 'd':
             for(int i=0;i<=3;i++)
                 for(int j=3;j>=1;j--){
@@ -232,7 +234,7 @@ void GameFunction::copy(){
 }
 
 int GameFunction::compareTwoBoardGame(){
-    
+
     for(int i=0;i<=3;i++)
         for(int j=0;j<=3;j++)
             if(board[i][j]!=copyBoard[i][j]) return canMove;
@@ -269,8 +271,9 @@ void GameFunction::gamePlay(){
     do{
         setZero();
         do{
-            system("clear");
+            system("cls");
             displayGameWithArandomNumber(random_index(), random_index());
+
             copy();
             do{
                 inputControlButton();
@@ -278,14 +281,13 @@ void GameFunction::gamePlay(){
                 plusValue();
                 if(findTwoValueIsSame()==0|| control=='q') break;
             }while(compareTwoBoardGame()==dontMove);
-    
+
         }while(checkWinOrLose()==continueLoop);
         printfInformationWinOrLose();
-        
+
         do{
             inputControlButton();
         }while(control!='y');
         score=0;
     }while(control=='y');
 }
-

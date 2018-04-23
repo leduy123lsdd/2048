@@ -1,13 +1,19 @@
-
-#include <iostream>
-#include <cstring>
-#include <time.h>
-#include<cstdlib>
+#include<iostream>
 #include<conio.h>
+#include<cstdlib>
 #include<windows.h>
+#include<ctime>
+#include<fstream>
 
 using namespace std;
+
 int random_index();
+
+void textColor(int color)
+{
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+}
+
 class GameFunction{
     public:
         int canMove=123;
@@ -20,6 +26,8 @@ class GameFunction{
         char control;
         int score=0;
 
+        void gotoxy(int x,int y);
+        void drawBoard();
         void displayGameWithArandomNumber(int,int);
         void inputControlButton();
         int checkWinOrLose();
@@ -32,18 +40,6 @@ class GameFunction{
         void printfInformationWinOrLose();
         void gamePlay();
 };
-
-//main function
-int main( ){
-
-    srand(time(0));
-    GameFunction exe;
-    exe.gamePlay();
-    system("pause");
-    return 0;
-}
-
-
 //function
 int random_index()
 {
@@ -62,6 +58,7 @@ void GameFunction::inputControlButton(){
         setZero();
     }
     if(control=='h' || control=='H'){
+            gotoxy(50,17);
         cout<<endl<<"w:move up"<<endl<<"s:move down"<<endl<<"a:move left"<<endl<<"d:move right"<<endl;
     }
     if(control=='W') control='w';
@@ -98,24 +95,76 @@ void GameFunction::displayGameWithArandomNumber(int i,int j){
     int k=random_index();
     if(k<=1) board[i][j]=2;
     else if(k>=2) board[i][j]=4;
-    cout<<endl<<"\t\t\t------ score:"<<score<<" ------"<<endl;
-    cout<<endl<<"\t\t\t--------------------- \t\tR: Restart game."<<endl;
-    for(int i=0;i<=3;i++){
-        for(int j=0;j<=3;j++){
-            if(j==0) cout<<"\t\t\t|";
-            if(board[i][j]==2 || board[i][j]==4 || board[i][j]==8) cout<<"  "<<board[i][j]<<" |";
-            else if(board[i][j]==16 || board[i][j]==32 || board[i][j]==64)
-                    cout<<" "<<board[i][j]<<" |";
-            else if(board[i][j]==128 || board[i][j]==256 || board[i][j]==512 )
-                    cout<<" "<<board[i][j]<<"|";
-            else if(board[i][j]==1024 || board[i][j]==2048  )
-                    cout<<board[i][j]<<"|";
-            else if(board[i][j]==0) cout<<"    |";
+
+    drawBoard();
+
+    gotoxy(49,0);
+    textColor(66);
+    cout<<"Score : "<<score;
+
+    textColor(14);
+    gotoxy(49,6); cout<<"H: help game";
+    gotoxy(49,7); cout<<"R: restart game";
+    gotoxy(49,8); cout<<"Q: quit game";
+
+
+    textColor(7);
+
+
+    int a =0,b=0;
+    for(int i = 0; i <= 3;i++){
+        for(int j = 0;j <= 3; j++){
+            if ( j == 0) a = 2;
+            else if ( j == 1) a = 10;
+            else if ( j == 2) a = 18;
+            else if(j == 3) a = 26;
+
+            if ( i == 0) b = 2;
+            else if ( i == 1) b = 6;
+            else if ( i == 2) b = 10;
+            else if(i == 3) b = 14;
+
+            gotoxy(a,b);
+            if(board[i][j] == 2){
+                textColor(1);
+                cout<<"  2 ";
+            }
+            else if(board[i][j] == 4) {
+                textColor(2);
+                cout<<"  4 ";
+            } else if(board[i][j] == 8) {
+                textColor(3);
+                cout<<"  8 ";
+            } else if(board[i][j] == 16) {
+                textColor(4);
+                cout<<" 16 ";
+            } else if(board[i][j] == 32) {
+                textColor(5);
+                cout<<" 32 ";
+            } else if(board[i][j] == 64) {
+                textColor(6);
+                cout<<" 64 ";
+            } else if(board[i][j] == 128) {
+                textColor(10);
+                cout<<" 128";
+            } else if(board[i][j] == 256) {
+                textColor(11);
+                cout<<" 256";
+            } else if(board[i][j] == 512) {
+                textColor(12);
+                cout<<" 512";
+            } else if(board[i][j] == 1024) {
+                textColor(13);
+                cout<<"1024";
+            } else if(board[i][j] == 2048) {
+                textColor(14);
+                cout<<"2048";
+            } else {
+                textColor(7);
+            }
         }
-        if(i==0) cout<<endl<<"\t\t\t--------------------- \t\tH: Help game."<<endl;
-        else if(i==1) cout<<endl<<"\t\t\t--------------------- \t\tQ: Quit game."<<endl;
-        else    cout<<endl<<"\t\t\t---------------------"<<endl;
     }
+
 }
 
 void GameFunction::fillSpace(){
@@ -187,7 +236,7 @@ void GameFunction::plusValue(){
             for(int i=0;i<=3;i++)
                 for(int j=0;j<=2;j++){
                     if(board[i][j]==board[i][j+1]){
-                        score+=board[i][j];
+                        score+=2*board[i][j];
                         board[i][j]*=2;
                         board[i][j+1]=0;
                         fillSpace();
@@ -198,7 +247,7 @@ void GameFunction::plusValue(){
             for(int i=0;i<=3;i++)
                 for(int j=3;j>=1;j--){
                     if(board[i][j]==board[i][j-1]){
-                        score+=board[i][j];
+                        score+=2*board[i][j];
                         board[i][j]*=2;
                         board[i][j-1]=0;
                         fillSpace();
@@ -208,7 +257,7 @@ void GameFunction::plusValue(){
             for(int j=0;j<=3;j++)
                 for(int i=0;i<=2;i++){
                     if(board[i][j]==board[i+1][j]){
-                        score+=board[i][j];
+                        score+=2*board[i][j];
                         board[i][j]*=2;
                         board[i+1][j]=0;
                         fillSpace();
@@ -218,7 +267,7 @@ void GameFunction::plusValue(){
             for(int j=0;j<=3;j++)
                 for(int i=3;i>=1;i--){
                     if(board[i][j]==board[i-1][j]){
-                        score+=board[i][j];
+                        score+=2*board[i][j];
                         board[i][j]*=2;
                         board[i-1][j]=0;
                         fillSpace();
@@ -260,10 +309,28 @@ int GameFunction::findTwoValueIsSame(){
 }
 
 void GameFunction::printfInformationWinOrLose(){
-    if(checkWinOrLose()==lose) cout<<endl<<"\t\t\t"<<"      You Lose    "<<endl;
-    else if(checkWinOrLose()==win) cout<<endl<<"\t\t\t      You Win     "<<endl;
-    else if(control=='q') cout<<endl<<"\t\t\t"<<"      You Lose    "<<endl;
-    cout<<endl<<"\t\t\tPress Y to play gain "<<endl;
+    if(checkWinOrLose()==lose){
+        gotoxy(50,2);
+        textColor(4);
+        cout<<"YOU LOSE";
+        gotoxy(45,3);   cout<<"------------------";
+    }
+    else if(checkWinOrLose()==win){
+        gotoxy(50,2);
+        textColor(2);
+        cout<<"YOU WIN";
+        gotoxy(45,3);   cout<<"------------------";
+    }
+    else if(control=='q'){
+        gotoxy(50,2);
+        textColor(4);
+        cout<<"YOU LOSE";
+        gotoxy(45,3);   cout<<"------------------";
+
+    }
+    textColor(7);
+    gotoxy(44,4);
+    cout<<"Press Y to play again";
 
 }
 
@@ -290,4 +357,112 @@ void GameFunction::gamePlay(){
         }while(control!='y');
         score=0;
     }while(control=='y');
+}
+
+void GameFunction::gotoxy(int x,int y)
+{
+    HANDLE hConsoleOutput;
+    COORD Cursor_an_Pos = { x,y};
+    hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleCursorPosition(hConsoleOutput , Cursor_an_Pos);
+}
+void clrscr()
+{
+    CONSOLE_SCREEN_BUFFER_INFO  csbiInfo;
+    HANDLE  hConsoleOut;
+    COORD   Home = { 0, 0 };
+    DWORD   dummy;
+    hConsoleOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    GetConsoleScreenBufferInfo(hConsoleOut, &csbiInfo);
+    FillConsoleOutputCharacter(hConsoleOut, ' ', csbiInfo.dwSize.X * csbiInfo.dwSize.Y, Home, &dummy);
+    csbiInfo.dwCursorPosition.X = 0;
+    csbiInfo.dwCursorPosition.Y = 0;
+    SetConsoleCursorPosition(hConsoleOut, csbiInfo.dwCursorPosition);
+}
+
+void hideCursor()
+{
+    HANDLE hOut;
+    CONSOLE_CURSOR_INFO ConCurInf;
+    hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    ConCurInf.dwSize = 10;
+    ConCurInf.bVisible = FALSE;
+    SetConsoleCursorInfo(hOut, &ConCurInf);
+}
+
+void GameFunction::drawBoard()
+{
+    textColor(64);
+    gotoxy(36,0);
+    for(int i=0;i<=16;i++)
+    {
+        for(int j=0;j<=32;j++)
+        {
+            if(i==0 && j==0)
+            {
+                gotoxy(j,i);
+                cout<<char(-55);
+            }
+            else if(i==16 && j==0)
+            {
+                gotoxy(j,i);
+                cout<<char(-56);
+            }
+            else if(i==0 && j==32)
+            {
+                gotoxy(j,i);
+                cout<<char(-69);
+            }
+            else if(i==16 && j==32)
+            {
+                gotoxy(j,i);
+                cout<<char(-68);
+            }
+            else if((i==4 || i==8 || i==12) && j==0)
+            {
+                gotoxy(j,i);
+                cout<<char(-52);
+            }
+            else if((i==4 || i==8 || i==12) && j==32)
+            {
+                gotoxy(j,i);
+                cout<<char(-71);
+            }
+            else if(i==0 && (j==8||j==16||j==24))
+            {
+                gotoxy(j,i);
+                cout<<char(-53);
+            }
+            else if(i==16 && (j==8 || j==16 || j==24))
+            {
+                gotoxy(j,i);
+                cout<<char(-54);
+            }
+            else if((i==4 || i==8 || i==12) && ( j==8 || j==16 || j==24))
+            {
+                gotoxy(j,i);
+                cout<<char(-50);
+            }
+            else if(i==0 || i==4 || i==8 || i==12 || i==16)
+            {
+                gotoxy(j,i);
+                cout<<char(-51);
+            }
+            else if(j==0 || j==8 || j==16 || j==24 || j==32)
+            {
+                gotoxy(j,i);
+                cout<<char(-70);
+            }
+        }
+    }
+    textColor(7);
+}
+
+int main( ){
+
+    srand(time(0));
+    GameFunction exe;
+    exe.gamePlay();
+    system("pause");
+    return 0;
 }
